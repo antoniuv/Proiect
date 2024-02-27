@@ -1,0 +1,190 @@
+﻿@model Proiect.Models.Channel
+
+
+@* Afisarea unui articol impreuna cu categoria din care face *@
+
+@if (TempData["message"] != null)
+{
+    <div class="alert @ViewBag.Alert p-3 rounded-3 text-center mb-5">
+        @ViewBag.Message
+    </div>
+}
+
+<br />
+
+<div class="card">
+
+    <div class="card-body">
+
+        <h3 class="card-title alert-success py-3 px-3 rounded-2">@Model.Name</h3>
+
+        <div class="card-text">@Model.Description</div>
+
+        <div class="d-flex justify-content-between flex-row mt-5">
+
+            <div><i class="bi bi-globe"></i> @Model.Category.CategoryName</div>
+
+            <span class="alert-success">@Model.Date</span>
+
+        </div>
+
+    </div>
+
+    @if (ViewBag.AfisareButoane == true && Model.UserId == ViewBag.UserCurent || ViewBag.EsteAdmin)
+    {
+        <div class="d-flex flex-row justify-content-between p-3 border-1 border-top">
+
+            <a class="btn btn-success" href="/Channels/Edit/@Model.Id">Editeaza Canal</a>
+
+            <a class="btn btn-success" href="/Channels/UserList/@Model.Id">Afiseaza Membri</a>
+
+            <a class="btn btn-success" href="/Channels/RequestList/@Model.Id">Afiseaza Cereri</a>
+
+            <form method="post" action="/Channels/Delete/@Model.Id">
+
+                <button class="btn btn-danger" type="submit">Sterge Canal</button>
+
+            </form>
+
+        </div>
+    }
+    else if (ViewBag.EsteModerator)
+    {
+        <div class="d-flex flex-row justify-content-between p-3 border-1 border-top">
+
+            <a class="btn btn-success" href="/Channels/Edit/@Model.Id">Editeaza Canal</a>
+
+            <a class="btn btn-success" href="/Channels/UserList/@Model.Id">Afiseaza Membri</a>
+
+            <a class="btn btn-success" href="/Channels/RequestList/@Model.Id">Afiseaza Cereri</a>
+
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-row justify-content-between p-3 border-1 border-top">
+            <a class="btn btn-success" href="/Channels/UserList/@Model.Id">Afiseaza Membri</a>
+        </div>
+    }
+    </div>
+
+
+<br />
+<br />
+
+@* Afisare mesaje impreuna cu butoanele de editare si stergere *@
+
+@foreach (var mess in Model.Messages)
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+
+            <div class="col-md-8">
+
+                <div>
+
+                    <p>@mess.Content</p>
+                    <small>@mess.Date</small>
+                    <strong><i class="bi bi-person"></i>@mess.User.UserName</strong>
+
+                </div>
+                <br>
+
+
+                @if (mess.UserId == ViewBag.UserCurent)
+                {
+
+                    <div class="d-flex">
+
+                        <div>
+
+                            <a class="btn btn-outline-primary" href="/Messages/Edit/@mess.Id"><i class="bi bi-pencil-square"></i>Editeaza</a>
+
+                        </div>
+
+                        <div>
+
+                            <form method="post" action="/Messages/Delete/@mess.Id">
+
+                                <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i>Sterge</button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+                }
+
+                @if ((ViewBag.EsteAdmin || ViewBag.EsteModerator) && mess.UserId != ViewBag.UserCurent)
+                    {
+
+                        <div class="d-flex">
+
+                            <div>
+
+                                <form method="post" action="/Messages/Delete/@mess.Id">
+
+                                    <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i>Sterge</button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+                    }
+
+                <br />
+
+            </div>
+
+            <div class="col-md-2"></div>
+
+        </div>
+
+    </div>
+}
+
+
+@* Afisarea formularului in care se poate adauga un comentariu *@
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-md-2"></div>
+
+        <div class="col-md-8">
+
+            <div class="card">
+
+                <form method="post" action="/Channels/Show/@Model.Id">
+
+                    <div class="card-body">
+
+                        <input type="hidden" name="ChannelId" value="@Model.Id" />
+
+                        <label>Continut Mesaj</label>
+                        <br />
+
+                        <textarea class="form-control" name="Content"></textarea>
+
+                        @Html.ValidationMessage("Content", null, new { @class = "text-danger" })
+
+                        <br /><br />
+
+                        <button class="btn btn-success " type="submit">Adauga Mesaj</button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-2"></div>
+
+    </div>
+
+</div>
